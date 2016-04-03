@@ -11,10 +11,10 @@ import traceback
 #from builtins import print
 
 #Variabl: that contains the user credentials to access Twitter API 
-access_token = '931455098-4cheNDFrVVjEqEwyqMEYdIfUznEUP0OZolsGvTeb'
-access_token_secret = 'SGJc2RsyyTnhP2RGvLeYniNzRC0sswhxmIIeoaNVsFcoL'
-consumer_key = 'jaCwGEBj0rGWkwMqwyGCgfk7q'
-consumer_secret = 'joFq8o1BPPIiNmlYMbcZKSa7YcO0W2SspyDagReTsMUfQzRPGK'
+access_token = '################################'
+access_token_secret = '################################'
+consumer_key = '################################'
+consumer_secret = '################################'
 
 # queue = None
 sqs = boto3.resource('sqs')
