@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<!--Following is the definition of HEAD (appearance)-->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!--<link rel="stylesheet" type="text/css" href="mainTwitterMap.css" media="screen, projection" />-->
+
+    <!--Following is the css style sheet (because it failed to recognize a seperate css file)-->
+    <style type="text/css">
+      html, body { height: 100%; margin: 0; padding: 0; }
+      #map { height: 60%;
+              width: 70%;
+              margin: 0 auto 0 auto;}
+
+       body {
+            background-image: url("http://www.planwallpaper.com/static/images/Cool_background-6_SBd4Ddp.jpg");
+            font-family: 'Helvetica Neue', sans-serif; 
+            font-size: 12px; 
+            font-weight: bold; 
+            letter-spacing: -1px; line-height: 1; 
+            text-align: center;
+        }
+
+        p {
+            color: rgb(255, 128, 0);
+            font-family: 'Helvetica Neue', sans-serif; 
+            font-size: 20px; 
+            text-align: center;
+        }
+
+        h1 { 
+            font-family:Georgia,serif;
+            color:#FFD700;
+            font-variant: small-caps; 
+            text-transform: none; 
+            font-size: 45px; 
+            font-weight: 100; 
+            margin-bottom: 20px;
+            margin-top: 70px;
+            }
+
+        ul {
+            background-color: white;
+        }
+
+        #dropdown {
+            background-color: yellow;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            padding: 12px 16px;
+            margin-bottom: 40px;
+        }
+
+        #floating-panel {
+          position: absolute;
+          top: 10px;
+          left: 25%;
+          z-index: 5;
+          background-color: #fff;
+          padding: 5px;
+          border: 1px solid #999;
+          text-align: center;
+          font-family: 'Roboto','sans-serif';
+          line-height: 30px;
+          padding-left: 10px;
+        }
+         #floating-panel {
+                background-color: #fff;
+                border: 3px solid blue;
+                position: absolute; /* could be absolute */
+                padding: 5px;
+                left: 10%;
+                top: 10px;
+                z-index: 5;
+                margin-bottom: 20px;
+              }
+        button {
+          background-color: #9932CC; /* Green */
+            border: none;
+            color: white;
+            padding: 12px 16px;
+            text-align: center;
+            display: inline-block;
+            font-size: 8px;
+        }
+
+    </style>
+    <!--<script src="/static/jquery-2.1.3.min.js"></script>-->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script> 
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD5O5pHXEn8v1avmYsLJsuAk2q73tQ-LY8&signed_in=true&libraries=visualization&callback=initMap">
+    </script>
+    <title> My first web for twitter</title>
+
+</head>
+
+
+<body>
+  <div id="links">
+      <h1>Master of Twitter searching</h1>
+      <p><b>Search for keyword</b></p>
+
+      <!--Following is the drop down menu, 10 WORDS TO CHANGE!!!-->
+      <!--['sunshine','rain','snow','laugh','seashore', 'the','a']-->
+      <select id = "dropdown" name="dropdown" onchange="getPoints()">
+        <option value="default">Select One</option>
+        <option value="happy">happy</option>
+        <option value="breakfast">breakfast</option>
+        <option value="cry">cry</option>
+        <option value="love">love</option>
+        <option value="rain">rain</option>
+        <option value="suck">suck</option>
+        <option value="music">music</option>
+        <option value="relax">relax</option>
+        <option value="angry">angry</option>
+        <option value="secret">secret</option>
+       <!--<option value="Seafood">Seafood</option>-->
+        <!--<option value="Barbeque">Barbeque</option>-->
+        <!--<option value="Vegetarian">Vegetarian</option>-->
+      </select>
+  </div>
+    
+ <!--Floating pannel, should not be very important-->
+  <div id="floating-panel">
+      <button onclick="toggleHeatmap()">Toggle Heatmap</button>
+      <button onclick="changeGradient()">Change gradient</button>
+      <button onclick="changeRadius()">Change radius</button>
+      <button onclick="changeOpacity()">Change opacity</button>
+  </div>
+
+ <div id="map"></div>
+    <script>
+
+// This example requires the Visualization library. Include the libraries=visualization
+// parameter when you first load the API. For example:
+// <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization">
+      
+        var map;
+        // WHY IS GOOGLE UNDEFINED HERE????????
+        //var points = [new google.maps.LatLng(37.782551, -122.445368)];
+      var markers = []
+      function initMap() {
+          map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 2,
+          center: new google.maps.LatLng(37.774546, -122.433523),
+          // zoom: 10,
+          // center: new google.maps.LatLng(-33.9, 151.2),
+          mapTypeId: google.maps.MapTypeId.SATELLITE
+
+        });
+
+        // heatmap = new google.maps.visualization.HeatmapLayer({
+        //   data: new google.maps.MVCArray(points),
+        //   //map: map
+        // });
+        // heatmap.setMap(map)
+        //setMarkers(map);
+      }
+      
+      // Heatmap data: 500 Points, IF DEFAULT IS SELECTED???
+      function getPoints() {
+          console.log('hahahahahahahahahahahahaha————————')
+          option = document.getElementById('dropdown').value
+          console.log(option)
+          
+          for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(null);
+          }
+          markers = []
+
+          if (option == 'default') {
+              return markers
+          }
+
+          $.getJSON('getTwits/' + option, function (result) {
+              
+              console.log('result' + result)
+              $.each(result.data, function (i, line) {
+                   // markers.push(new google.maps.LatLng(line.latitude, line.longitude));
+                   //pointArray = new google.maps.MVCArray(points);
+                  //heatmap.setData(pointArray);
+                  console.log(line)
+                  console.log(line.latitude)
+                  console.log(line.longitude)
+                  la = parseFloat(line.latitude)
+                  lo = parseFloat(line.longitude)
+                  sentiment = line.senti
+                  console.log(sentiment)
+                  baseurl = ''
+                  if(sentiment == "positive") {
+                    baseurl = 'https://maps.gstatic.com/mapfiles/ms2/micons/red-pushpin.png';
+                  } else if(sentiment == "negative") {
+                    baseurl = 'https://maps.gstatic.com/mapfiles/ms2/micons/ltblu-pushpin.png';
+                  } else{
+                    baseurl = 'https://maps.gstatic.com/mapfiles/ms2/micons/ylw-pushpin.png';
+                  }
+                  console.log('*****************************')
+                  var image = {
+                      //url: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png',
+                      url: baseurl,
+                      // This marker is 20 pixels wide by 32 pixels high.
+                      size: new google.maps.Size(50, 50),
+                      // The origin for this image is (0, 0).
+                      origin: new google.maps.Point(0, 0),
+                      // The anchor for this image is the base of the flagpole at (0, 32).
+                      anchor: new google.maps.Point(0, 32)
+                    };
+                  var shape = {
+                    coords: [1, 1, 1, 20, 18, 20, 18, 1],
+                    type: 'poly'
+                  };
+
+                  markers.push(new google.maps.Marker({position: {lat: la, lng: lo}, map: map, icon: image, shape: shape}));
+           
+
+              });
+          });
+      }
+
+    </script>
+</body>
+</html>
