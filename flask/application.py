@@ -1,21 +1,18 @@
 from os import environ, system
 from datetime import datetime
 from flask import render_template, jsonify, Flask, request
-# from TwitterMapProj import app
-#from elasticsearch import ElasticSearch
-# from pyes import *
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
 import requests
 import json
-
 from pyes import *
 
-#conn = ES('127.0.0.1:9200')
-# conn = ES('172.31.53.200:9200')
+from flask_socketio import SocketIO, emit
+from gevent import monkey
 
 application = app = Flask(__name__)
+socketio = SocketIO(application, async_mode='gevent')
 
 @app.route('/', methods = ['GET', 'POST', 'PUT'])
 def home():
@@ -31,6 +28,9 @@ def home():
         # COULD BE WRONG HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         conn.index({"key":tokens[0], "longitude": tokens[1], "latitude": tokens[2], "senti": tokens[3]}, "test-index", "test-type")
         print tokens
+
+        socketio.emit('new tweets', {'data': tokens}, namespace='')
+
     except:
         print 'INSIDE OF THE EXCEPTION'
 
@@ -84,4 +84,5 @@ if __name__ == '__main__':
     }
     conn.indices.put_mapping("test-type", {'properties':mapping}, ["test-index"])
 
-    app.run(debug=True, host='0.0.0.0')
+    # app.run(debug=True, host='0.0.0.0')
+    socketio.run(app, debug=True, host='0.0.0.0')
