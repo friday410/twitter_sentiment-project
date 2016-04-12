@@ -10,7 +10,7 @@ queue = sqs.get_queue_by_name(QueueName='tweetsQueue2')
 def send_message(mes):
     try:
         REGION = 'us-east-1'
-        TOPIC = ''
+        TOPIC = '###############################'
         conn = boto.sns.connect_to_region(REGION)
         conn.publish(topic = TOPIC, message=mes)
     except:
